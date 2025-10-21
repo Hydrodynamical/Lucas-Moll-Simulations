@@ -1,0 +1,7 @@
+# Packages needed for v1.py simulation
+numpy
+matplotlib
+pandas
+pillow
+tqdm
+
