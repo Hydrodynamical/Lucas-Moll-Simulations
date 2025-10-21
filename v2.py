@@ -12,13 +12,10 @@ Learning front estimator uses the *same* policy as a weight, w = s_m(I), and sol
 
 This file is self-contained. Run it directly to simulate, plot, and export a CSV of the front time series.
 """
-from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas as pd
-from dataclasses import dataclass
-from typing import Sequence, Dict, Any, Tuple
 
 try:
     from tqdm import tqdm  # type: ignore
@@ -27,36 +24,48 @@ except Exception:  # fallback if tqdm is unavailable
 
 # ----------------------------- Configuration ----------------------------- #
 
-@dataclass
 class SimConfig:
-    # Core simulation
-    N: int = 20_000
-    T: float = 200.0
-    dt: float = 5e-4
-    seed: int = 7
-
-    # Diffusion and discount
-    diffusion_sigma: float = float(np.sqrt(2.0))   # ⇒ kappa = 1
-    rho: float = 2.0                               # discount used in front estimator
-
-    # Meeting technology alpha(s) = alpha1 * s^k with k in (0,1)
-    # We parameterize by gamma = k/(1-k) so that k = gamma/(1+gamma).
-    alpha1: float = 0.25                          # weak learning (< kappa) for lottery regime
-    gamma: float = 1.0                            # gamma=1 ⇒ k=1/2 (canonical theorem case)
-
-    # Snapshots and plotting
-    snapshot_fractions: Sequence[float] = tuple(i/100 for i in range(101))
-    show_progress: bool = True
-
-    # Initial condition
-    init_mean: float = 0.0
-    init_std: float = 2.0
-    right_truncate: bool = True                    # compact right tail as in the paper
-    right_cap: float = 10                         # X0 = min(X0, right_cap)
+    """Plain configuration object mirroring the previous dataclass defaults.
+    Fields are set in __init__ to avoid any use of annotations.
+    """
+    def __init__(
+        self,
+        N=20_000,
+        T=200.0,
+        dt=5e-4,
+        seed=7,
+        diffusion_sigma=float(np.sqrt(2.0)),
+        rho=2.0,
+        alpha1=0.25,
+        gamma=1.0,
+        snapshot_fractions=None,
+        show_progress=True,
+        init_mean=0.0,
+        init_std=2.0,
+        right_truncate=True,
+        right_cap=10,
+    ):
+        self.N = N
+        self.T = T
+        self.dt = dt
+        self.seed = seed
+        self.diffusion_sigma = diffusion_sigma
+        self.rho = rho
+        self.alpha1 = alpha1
+        self.gamma = gamma
+        if snapshot_fractions is None:
+            self.snapshot_fractions = tuple(i / 100 for i in range(101))
+        else:
+            self.snapshot_fractions = snapshot_fractions
+        self.show_progress = show_progress
+        self.init_mean = init_mean
+        self.init_std = init_std
+        self.right_truncate = right_truncate
+        self.right_cap = right_cap
 
 # ---------------------- Utility: compute I(x) fast ----------------------- #
 
-def compute_I_of_X(X: np.ndarray, config: SimConfig) -> np.ndarray:
+def compute_I_of_X(X, config):
     """Compute I_k = (1/(rho - kappa)) * (1/N) * sum_j exp(X_j - X_k) * 1_{X_j >= X_k} for all k.
     O(N log N) via sorting and reverse cumulative sums. Uses a maximum shift for numerical stability.
     """
@@ -74,7 +83,7 @@ def compute_I_of_X(X: np.ndarray, config: SimConfig) -> np.ndarray:
 
 # --------------------------- Simulator core ------------------------------ #
 
-def simulate(config: SimConfig) -> Dict[str, Any]:
+def simulate(config):
     # Initialize number of random seed, N, T, dt and define number of steps
     rng = np.random.default_rng(config.seed)        # set random seed
     N, T, dt = config.N, config.T, config.dt        # initialize configuration N, T, dt
@@ -88,7 +97,7 @@ def simulate(config: SimConfig) -> Dict[str, Any]:
         X = np.minimum(X, config.right_cap)
 
     times, means, vars_ = [], [], []
-    snapshots: Dict[float, np.ndarray] = {}
+    snapshots = {}
 
     # snapshot indices
     fractions = sorted(set(float(f) for f in config.snapshot_fractions))
@@ -154,7 +163,7 @@ def simulate(config: SimConfig) -> Dict[str, Any]:
 
 # ------------------------ Front computation helpers ---------------------- #
 
-def _intrinsic_front_for_snapshot_exact(X: np.ndarray, rho: float, kappa: float, alpha_prime1: float):
+def _intrinsic_front_for_snapshot_exact(X, rho, kappa, alpha_prime1):
     """
     Returns (eta_m, e_ell, ok) with e_ell computed from the exact empirical root:
     J(x) = (1/(rho-kappa)) * (e^{-x}/N) * sum_{X_i >= x} e^{X_i} = 1/alpha'(1).
@@ -187,7 +196,7 @@ def _intrinsic_front_for_snapshot_exact(X: np.ndarray, rho: float, kappa: float,
     return eta_m, float(x_star[j]), True
 
 
-def _learning_front_for_snapshot_exact(X: np.ndarray, rho: float, kappa: float, alpha1: float, gamma: float):
+def _learning_front_for_snapshot_exact(X, rho, kappa, alpha1, gamma):
     """
     Exact empirical root for the learning-weighted functional J_w(x):
     J_w(x) = (1/(rho-kappa)) * (e^{-x}/N) * sum_{X_i >= x} e^{X_i} w_i = 1/(alpha1*k).
@@ -229,15 +238,7 @@ def _learning_front_for_snapshot_exact(X: np.ndarray, rho: float, kappa: float, 
     return float(x_star[j])
 
 
-def check_front_equations(
-    snapshot: np.ndarray,
-    x_check: float,
-    rho: float,
-    kappa: float,
-    alpha1: float,
-    gamma: float,
-    which: str = "intrinsic",
-    ) -> Tuple[float, float]:
+def check_front_equations(snapshot, x_check, rho, kappa, alpha1, gamma, which="intrinsic"):
     
     Xs = np.sort(snapshot)
     expXs = np.exp(Xs)
@@ -263,7 +264,7 @@ def check_front_equations(
     return (J, target) if which == "intrinsic" else (Jw, target)
 
 
-def track_fronts_over_time_with_learning(result: Dict[str, Any]) -> pd.DataFrame:
+def track_fronts_over_time_with_learning(result):
     cfg = result["config"]
     rho = float(cfg.rho)
     kappa = float(result["kappa"])
@@ -280,7 +281,7 @@ def track_fronts_over_time_with_learning(result: Dict[str, Any]) -> pd.DataFrame
     return pd.DataFrame(rows).sort_values("time").reset_index(drop=True)
 
     
-def compute_histogram_scale(snapshots: Dict[float, np.ndarray], bins: int):
+def compute_histogram_scale(snapshots, bins):
     if not snapshots:
         raise ValueError("Simulation result has no snapshots to analyse.")
     arrays = list(snapshots.values())
@@ -302,15 +303,7 @@ def compute_histogram_scale(snapshots: Dict[float, np.ndarray], bins: int):
     return bin_edges, (left, right), (0.0, y_max * 1.05)
 
 
-def save_histogram_gif(
-    result: Dict[str, Any],
-    path: str = "sim_histograms.gif",
-    bins: int = 100,
-    fps: int = 2,
-    bin_edges: Sequence[float] | np.ndarray | None = None,
-    x_limits: Tuple[float, float] | None = None,
-    y_limits: Tuple[float, float] | None = None,
-    ):
+def save_histogram_gif(result, path="sim_histograms.gif", bins=100, fps=2, bin_edges=None, x_limits=None, y_limits=None):
     snapshots = result.get("snapshots", {})
     if not snapshots:
         raise ValueError("Simulation result has no snapshots to animate.")
@@ -319,10 +312,9 @@ def save_histogram_gif(
     if bin_edges is None or x_limits is None or y_limits is None:
         bin_edges, x_limits, y_limits = compute_histogram_scale(snapshots, bins)
     plot_bins_array = np.asarray(bin_edges, dtype=float)
-    plot_bins: Sequence[float] = tuple(float(x) for x in plot_bins_array)
+    plot_bins = tuple(float(x) for x in plot_bins_array)
     fig, ax = plt.subplots(figsize=(6, 4))
-
-    def update(frame_idx: int):
+    def update(frame_idx):
         ax.clear()
         ax.hist(data[frame_idx], bins=plot_bins, density=True)
         ax.set_xlabel("x")
@@ -348,7 +340,7 @@ def save_histogram_gif(
 
 # ----------------------------- Diagnostics ------------------------------- #
 
-def _fit_slope(ts: np.ndarray, ys: np.ndarray, tail_frac: float = 0.7) -> float:
+def _fit_slope(ts, ys, tail_frac=0.7):
     a = int(tail_frac * len(ts))
     X = np.vstack([ts[a:], np.ones(len(ts[a:]))]).T
     m, b = np.linalg.lstsq(X, ys[a:], rcond=None)[0]
@@ -360,7 +352,7 @@ if __name__ == "__main__":
     # Lottery-society regime: kappa = 1 (sigma = sqrt(2)), rho > 1, alpha1 < 1, gamma = 1 ⇒ k = 1/2
     cfg = SimConfig(
         N=30_000,
-        T=200.0,
+        T=300.0,
         dt=5e-5,
         seed=7,
         diffusion_sigma=float(np.sqrt(2.0)),    # kappa = sigma **2 /2 
@@ -376,11 +368,11 @@ if __name__ == "__main__":
     df_fronts = track_fronts_over_time_with_learning(result)
     df_fronts.to_csv("fronts_timeseries.csv", index=False)
 
-    hist_edges, x_limits, y_limits = compute_histogram_scale(result["snapshots"], bins=200)
+    hist_edges, x_limits, y_limits = compute_histogram_scale(result["snapshots"], bins=223)
     gif_path = save_histogram_gif(
         result,
         path="sim_histograms.gif",
-        bins=200,
+        bins=223,
         bin_edges=hist_edges,
         x_limits=x_limits,
         y_limits=y_limits,
