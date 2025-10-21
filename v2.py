@@ -12,6 +12,7 @@ Learning front estimator uses the *same* policy as a weight, w = s_m(I), and sol
 
 This file is self-contained. Run it directly to simulate, plot, and export a CSV of the front time series.
 """
+from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
