@@ -351,13 +351,13 @@ def _fit_slope(ts, ys, tail_frac=0.7):
 if __name__ == "__main__":
     # Lottery-society regime: kappa = 1 (sigma = sqrt(2)), rho > 1, alpha1 < 1, gamma = 1 ⇒ k = 1/2
     cfg = SimConfig(
-        N=30_000,
-        T=300.0,
+        N=100_000,
+        T=100.0,
         dt=5e-5,
         seed=7,
         diffusion_sigma=float(np.sqrt(2.0)),    # kappa = sigma **2 /2 
         rho=2.0,
-        alpha1=0.1,                            # weak learning: alpha1 < kappa (< rho)
+        alpha1=0.15,                            # weak learning: alpha1 < kappa (< rho)
         gamma=1,                                # gamma = 1 ⇒ k = 1/2
         right_truncate=False,
         right_cap=10,
