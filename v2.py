@@ -41,7 +41,7 @@ class SimConfig:
         snapshot_fractions=None,
         show_progress=True,
         init_mean=0.0,
-        init_std=2.0,
+        init_std=5.0,
         right_truncate=True,
         right_cap=10,
     ):
@@ -351,14 +351,14 @@ def _fit_slope(ts, ys, tail_frac=0.7):
 if __name__ == "__main__":
     # Lottery-society regime: kappa = 1 (sigma = sqrt(2)), rho > 1, alpha1 < 1, gamma = 1 ⇒ k = 1/2
     cfg = SimConfig(
-        N=30_000,
-        T=300.0,
-        dt=5e-5,
+        N=750_000,
+        T=1.0,
+        dt=1e-5,
         seed=7,
         diffusion_sigma=float(np.sqrt(2.0)),    # kappa = sigma **2 /2 
         rho=2.0,
-        alpha1=0.1,                            # weak learning: alpha1 < kappa (< rho)
-        gamma=1,                                # gamma = 1 ⇒ k = 1/2
+        alpha1=0.01,                            # weak learning: alpha1 < kappa (< rho)
+        gamma=1,                                # gamma = 1 ⇒ k = 1/2 
         right_truncate=False,
         right_cap=10,
         show_progress=True,
