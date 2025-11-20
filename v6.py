@@ -667,6 +667,61 @@ if __name__ == "__main__":
 
     df_fronts.to_csv("fronts_timeseries_PDE_match.csv", index=False)
 
+    # ----------------------------------------------------
+    # Compare PDE vs particle fronts as functions of time
+    # ----------------------------------------------------
+
+    # Particle times and fronts (grid-based)
+    times_part = df_fronts["time"].to_numpy(dtype=float)
+    eta_m_part = df_fronts["eta_m"].to_numpy(dtype=float)
+    z_L_part   = df_fronts["z_L"].to_numpy(dtype=float)
+
+    # Interpolate PDE fronts at the particle snapshot times
+    med_pde_interp = np.interp(times_part, times_pde, medians_pde)
+    lf_pde_interp  = np.interp(times_part, times_pde, learning_fronts_pde)
+
+    # 1) Overlay: PDE vs particle median front
+    plt.figure(figsize=(8, 4.5))
+    plt.plot(times_pde, medians_pde, label="PDE median", alpha=0.8)
+    plt.plot(times_part, eta_m_part, "o", ms=3, label="particle median (grid-based)")
+    plt.xlabel("time")
+    plt.ylabel("position")
+    plt.title("Median front: PDE vs particles")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # 2) Overlay: PDE vs particle learning front
+    plt.figure(figsize=(8, 4.5))
+    plt.plot(times_pde, learning_fronts_pde, label="PDE learning front", alpha=0.8)
+    plt.plot(times_part, z_L_part, "o", ms=3, label="particle learning front (grid-based)")
+    plt.xlabel("time")
+    plt.ylabel("position")
+    plt.title("Learning front: PDE vs particles")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # 3) Difference plots to see time dependence of the discrepancy
+    plt.figure(figsize=(8, 4.5))
+    plt.plot(times_part, eta_m_part - med_pde_interp)
+    plt.xlabel("time")
+    plt.ylabel("particle median - PDE median")
+    plt.title("Median front discrepancy over time")
+    plt.axhline(0.0, color="k", linewidth=0.8)
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure(figsize=(8, 4.5))
+    plt.plot(times_part, z_L_part - lf_pde_interp)
+    plt.xlabel("time")
+    plt.ylabel("particle learning front - PDE learning front")
+    plt.title("Learning front discrepancy over time")
+    plt.axhline(0.0, color="k", linewidth=0.8)
+    plt.tight_layout()
+    plt.show()
+
+
     # Histogram GIF (N-particle only)
     hist_edges, x_limits, y_limits = compute_histogram_scale(
         result_particles["snapshots"], bins=223
