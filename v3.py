@@ -7,8 +7,8 @@ from tqdm import trange
 # Parameters and grid
 # -------------------------
 L = 200.0          # enlarged spatial domain
-N = 1000
-x = np.linspace(-L, L, N)
+N = 500
+x = np.linspace(-int(L/4), L, N)
 dx = x[1] - x[0]
 
 # Precompute exp(y - z) - 1 matrix for alpha
@@ -26,7 +26,7 @@ T_final = 50.0
 num_steps = int(T_final / dt)
 
 # Alpha parameters
-alpha1 = 0.8
+alpha1 = 4.0
 gamma = 2.0
 
 # -------------------------

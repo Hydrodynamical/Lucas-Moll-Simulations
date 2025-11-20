@@ -42,3 +42,12 @@ deactivate
 ```
 
 Leaving the environment restores the shell to the system-wide Python interpreter.
+
+## 6. Versions
+
+- v1.py is the initial many agent attempt with incorrect learning function
+- v2.py is the updated many agent code with incorrect learning function
+- v3.py is the PDE simulator with the correct learning function
+- v4.py is the PDE simulator with the correct learning function, and produces the an image of the transition to the lottery society below $\alpha_1 \leq 1$.
+- v5.py is the corrected many agent code.
+- v6.py overlays the PDE simulator against the particle simulator. The learning front for the particle simulator lags, although the median fronts are the same speed. This indicates the presence of a finite $N$ effect.

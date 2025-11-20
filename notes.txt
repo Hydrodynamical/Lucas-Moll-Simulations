@@ -1,4 +1,0 @@
-Estimated late-time speeds: c_m≈0.068, c_ℓ≈0.413, c_intr≈0.474
-
-t=75.0  q99(alpha)=0.0100  mean alpha=0.0100  scale*I_median=5787672283939.057
-t=75.0 unsat_frac=0.005700  q99(alpha)=0.0100
