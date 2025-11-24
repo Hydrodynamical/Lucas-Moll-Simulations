@@ -644,7 +644,7 @@ def make_pde_vs_particles_animation(
 if __name__ == "__main__":
     # N-particle config (matched parameters)
     cfg = SimConfig(
-        N=100_000,
+        N=2_000_000,
         T=50.0,
         dt=1e-3,
         seed=7,
