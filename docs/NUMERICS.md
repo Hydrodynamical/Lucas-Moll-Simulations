@@ -5,10 +5,10 @@
 Let `f(t,x)` be the distribution of knowledge states. The prescribed learning
 intensity is
 
-$$
+```math
 A_f(x)=\int_x^\infty (e^{y-x}-1)f(y)\,dy,
 \qquad \alpha_f(x)=\alpha_1\min\{1,A_f(x)\}^{\gamma}.
-$$
+```
 
 An agent follows `dX = sqrt(2D) dB` between meetings, with `D=1` by default.
 At a meeting it samples another agent uniformly and replaces its own state
@@ -20,11 +20,13 @@ denominator N-1, as in the intended finite-agent convention.
 
 The corresponding mean-field equation is
 
-$$
-\partial_t f = D\partial_{xx}f
-+ f(x)\int_{-\infty}^x\alpha_f(y)f(y)\,dy
-- \alpha_f(x)f(x)\int_x^\infty f(y)\,dy.
-$$
+```math
+\begin{aligned}
+\partial_t f &= D\partial_{xx}f \\
+&\quad + f(x)\int_{-\infty}^x\alpha_f(y)f(y)\,dy \\
+&\quad - \alpha_f(x)f(x)\int_x^\infty f(y)\,dy.
+\end{aligned}
+```
 
 No value function or optimal learning control is computed.
 
@@ -37,9 +39,9 @@ inclusive discrete cumulative sums; their diagonal terms cancel.
 
 Configuration validation requires
 
-$$
+```math
 \Delta t\left(2D/(\Delta x)^2+\alpha_1\right)\leq 1,
-$$
+```
 
 a sufficient positivity condition for the update when the grid density is
 nonnegative and normalized. This condition also bounds the particle jump
