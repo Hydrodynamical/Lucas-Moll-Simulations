@@ -83,6 +83,26 @@ are still needed. The corrected runner also changes peer sampling and
 diagnostic timing, so **the same seed does not reproduce the old trajectories**.
 See [the migration notes](docs/MIGRATION.md).
 
+## Regenerated preview and figures
+
+The [100,000-particle preview](docs/previews/100k-2026-11-02/README.md) uses the
+corrected runner with the research time horizon, PDE grid, timestep, and seed.
+It is a smaller run than the historical two-million-particle experiment.
+
+```bash
+python -m lucas_moll --config configs/preview.json --no-plots --output results/preview
+python -m lucas_moll.render results/preview --output results/preview/figures --label '100,000-particle preview' --gif
+```
+
+The separate renderer reads the saved numerical data, so figures can be
+regenerated without repeating the simulation. It produces four figures as
+PNG and SVG files (front trajectories with common-window fits, front
+differences, final densities, and density snapshots), plus comparison and
+particle-only GIFs. Every figure carries the run label and parameters.
+Density views use one fixed display window across times; the full grid
+remains in the numerical archive. A figure manifest records the display
+limits, simulation metadata, and hashes of the input artifacts.
+
 ## Repository map
 
 | Path | Purpose |

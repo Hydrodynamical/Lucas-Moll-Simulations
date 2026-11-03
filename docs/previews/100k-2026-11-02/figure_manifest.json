@@ -1,0 +1,71 @@
+{
+  "label": "100,000-particle preview",
+  "renderer_source_sha256": "efe3a38f26edf379b615329caeb8882f13667c05386f40813f8ab2301794f6ab",
+  "simulation_metadata": {
+    "schema_version": 1,
+    "saved_at_utc": "2026-11-03T02:51:36.597924+00:00",
+    "config": {
+      "particles": 100000,
+      "final_time": 50.0,
+      "dt": 0.001,
+      "seed": 7,
+      "x_min": -50.0,
+      "x_max": 200.0,
+      "grid_points": 500,
+      "diffusion": 1.0,
+      "alpha1": 0.1,
+      "gamma": 2.0,
+      "init_mean": 0.0,
+      "init_std": 1.5,
+      "snapshots": 101,
+      "fit_start": 35.0
+    },
+    "source": {
+      "commit": "77deb670be42abc63a1ac7e544f37ec356ca0f4d",
+      "dirty": false
+    },
+    "environment": {
+      "python": "3.12.12",
+      "numpy": "2.5.4",
+      "matplotlib": "3.11.2",
+      "pillow": "12.3.0"
+    },
+    "diagnostics": {
+      "max_pde_mass_drift_before_normalization": 5.551115123125783e-16,
+      "total_pde_mass_clipped": 0.0,
+      "max_pde_endpoint_cell_mass": 1.5822087815112315e-09,
+      "max_outside_particles_at_snapshots": 0
+    },
+    "finite_window_fits": {
+      "requested_start": 35.0,
+      "sample_count": 31,
+      "actual_start": 35.0,
+      "actual_end": 50.0,
+      "median": {
+        "pde_slope": 0.48687065559516585,
+        "particle_slope": 0.48642037508778324
+      },
+      "learning_front": {
+        "pde_slope": 1.1205157230195901,
+        "particle_slope": 0.714070279129482
+      }
+    },
+    "notes": [
+      "Prescribed learning rule; no HJB or optimal-control equation is solved.",
+      "Particle fronts are undefined when particles fall outside the histogram grid.",
+      "A short run or a single seed does not establish a finite-population effect."
+    ]
+  },
+  "source_artifacts_sha256": {
+    "metadata.json": "297cc68629f3f2e619fc2fbd2d1d605f590b39c34759920ee9eedcc506c2182c",
+    "fronts.csv": "25be06262d692d0ef28332256b14453bc2712c2e472a749cce9a0c51e74fc698",
+    "snapshots.npz": "f09d0930d0cb8c9dfce56f63530a8ad93959a9f415caee71f1a68c893adf73b5"
+  },
+  "display_x_limits": [
+    -32.527529555115976,
+    62.16137217378237
+  ],
+  "display_note": "Density panels zoom to the central 99.98% of saved grid mass plus all finite fronts; full numerical grid is retained in snapshots.npz.",
+  "frames": 101,
+  "fps": 5
+}
