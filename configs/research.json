@@ -1,0 +1,16 @@
+{
+  "particles": 2000000,
+  "final_time": 50.0,
+  "dt": 0.001,
+  "seed": 7,
+  "x_min": -50.0,
+  "x_max": 200.0,
+  "grid_points": 500,
+  "diffusion": 1.0,
+  "alpha1": 0.1,
+  "gamma": 2.0,
+  "init_mean": 0.0,
+  "init_std": 1.5,
+  "snapshots": 101,
+  "fit_start": 35.0
+}
