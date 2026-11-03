@@ -1,0 +1,4 @@
+# Matplotlib exports SVG path data with trailing spaces; keep generated files intact.
+docs/previews/**/*.svg linguist-generated=true whitespace=-blank-at-eol
+# Python's CSV writer emits CRLF records.
+docs/previews/**/*.csv whitespace=cr-at-eol
